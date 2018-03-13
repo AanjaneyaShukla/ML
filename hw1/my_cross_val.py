@@ -1,0 +1,28 @@
+import numpy as np
+import util
+
+def my_cross_val(method, X, y, k):
+    input_data = np.column_stack((X, y))
+    np.random.shuffle(input_data)
+    k_split_input_data = np.array_split(input_data, k)
+    error_rate = []
+
+    for x in range(0, k):
+        input_data_train = None
+        input_data_test = k_split_input_data[x]
+        for y in range(0, k):
+            if x != y:
+                if input_data_train is None:
+                    input_data_train = k_split_input_data[y]
+                else:
+                    input_data_train = np.row_stack((input_data_train, k_split_input_data[y]))
+
+        [X_train, y_train] = util.get_train_test(input_data_train)
+        [X_test, y_test] = util.get_train_test(input_data_test)
+
+        util.run_models(method, error_rate, X_train, y_train, X_test, y_test)
+    error_mean = np.mean(error_rate)
+    error_std = np.std(error_rate)
+
+    print error_rate, error_mean, error_std
+    return error_rate
